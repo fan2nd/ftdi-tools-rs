@@ -1,9 +1,9 @@
 //! I2C LM75 Temperature Sensor Example
 //! Read LM75 temperature sensor data via I2C interface using FTDI chip
-use std::sync::{Arc, Mutex};
 use anyhow::anyhow;
 use ftdi_tools::{i2c::FtdiI2c, list_all_device, mpsse::FtdiMpsse};
 use lm75::Lm75;
+use std::sync::{Arc, Mutex};
 
 fn main() -> anyhow::Result<()> {
     // Initialize logging system
@@ -40,4 +40,3 @@ fn main() -> anyhow::Result<()> {
     println!("Temperature: {}°C", temp);
     Ok(())
 }
-

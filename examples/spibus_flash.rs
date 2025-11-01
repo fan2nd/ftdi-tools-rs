@@ -26,14 +26,11 @@
 //! RUST_LOG=info cargo run --example spibus_flash
 //! ```
 
-use std::{
-    cell::RefCell,
-    sync::{Arc, Mutex},
-};
+use std::sync::{Arc, Mutex};
 
 use anyhow::anyhow;
 use eh1::spi::SpiDevice;
-use embedded_hal_bus::spi::RefCellDevice;
+use embedded_hal_bus::spi::ExclusiveDevice;
 use ftdi_tools::{
     Interface, Pin, gpio::FtdiOutputPin, list_all_device, mpsse::FtdiMpsse, spi::FtdiSpi,
 };
@@ -93,9 +90,8 @@ fn main() -> anyhow::Result<()> {
     // 使用 Arc<Mutex<>> 包装以支持多线程安全访问
     let mtx = Arc::new(Mutex::new(mpsse));
 
-    // 创建 SPI 控制器并将其包装在 RefCell 中
-    // RefCell 允许在运行时进行内部可变性检查
-    let spi = RefCell::new(FtdiSpi::new(mtx.clone())?);
+    // 创建 SPI 控制器
+    let spi = FtdiSpi::new(mtx.clone())?;
 
     // 创建 GPIO 输出引脚用于控制 Flash 的片选 (CS) 信号
     // Pin::Lower(3) 对应 FTDI AD3 引脚
@@ -103,7 +99,7 @@ fn main() -> anyhow::Result<()> {
 
     // 创建 SPI 设备实例，结合 SPI 总线和片选控制
     // RefCellDevice::new_no_delay 创建一个没有延时的 SPI 设备实例
-    let mut flash_device = FlashDevice(RefCellDevice::new_no_delay(&spi, cs)?);
+    let mut flash_device = FlashDevice(ExclusiveDevice::new_no_delay(spi, cs)?);
 
     // 初始化 Flash 存储器接口
     let mut flash = Flash::new(&mut flash_device);
