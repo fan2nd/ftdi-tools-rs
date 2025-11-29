@@ -21,3 +21,4 @@ lm75 = "1.0.0"
 mipidsi = "0.9.0"
 sht31 = "0.3.2"
 spi-flash = "0.3.0"
+ssd1680 = { git = "https://github.com/fan2nd/ssd1680" }
