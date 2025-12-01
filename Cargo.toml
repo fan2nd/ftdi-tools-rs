@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 bitfield-struct = "0.11.0"
 eh1 = { package = "embedded-hal", version = "1" }
+embedded-hal-async = "1.0.0"
 futures-lite = "2.6.0"
 log = "0.4.27"
 nusb = "0.1.14"

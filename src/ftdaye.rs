@@ -1,5 +1,5 @@
 use crate::{FtdiError, Interface};
-use futures_lite::future::{block_on, zip};
+use futures_lite::future::zip;
 use nusb::transfer::{Control, ControlType, Recipient, RequestBuffer};
 use std::time::Duration;
 
@@ -152,8 +152,5 @@ impl FtdiContext {
         let (write_result, read_result) = zip(self.async_write(write), self.async_read(read)).await;
         write_result?;
         read_result
-    }
-    pub(crate) fn write_read(&self, write: Vec<u8>, read: &mut [u8]) -> Result<(), FtdiError> {
-        block_on(self.async_write_read(write, read))
     }
 }

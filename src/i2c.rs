@@ -6,6 +6,7 @@ use crate::{
     mpsse_cmd::MpsseCmdBuilder,
 };
 use eh1::i2c::{ErrorKind, NoAcknowledgeSource, Operation, SevenBitAddress};
+use futures_lite::future::block_on;
 use std::sync::{Arc, Mutex};
 
 #[derive(Debug, thiserror::Error)]
@@ -198,7 +199,7 @@ impl FtdiI2c {
 
         Ok(())
     }
-    fn transaction_fast(
+    async fn transaction_async(
         &mut self,
         address: u8,
         operations: &mut [Operation<'_>],
@@ -245,7 +246,8 @@ impl FtdiI2c {
             }
         }
         cmd.end(self.start_stop_cmds);
-        let response = lock.exec(cmd)?;
+
+        let response = lock.exec_async(cmd).await?;
 
         // parse response
         prev_op_was_a_read = false;
@@ -317,10 +319,20 @@ impl eh1::i2c::I2c for FtdiI2c {
         operations: &mut [Operation<'_>],
     ) -> Result<(), Self::Error> {
         if self.enable_fast {
-            self.transaction_fast(address, operations)
+            block_on(self.transaction_async(address, operations))
         } else {
             self.transaction(address, operations)
         }
+    }
+}
+
+impl embedded_hal_async::i2c::I2c for FtdiI2c {
+    async fn transaction(
+        &mut self,
+        address: u8,
+        operations: &mut [Operation<'_>],
+    ) -> Result<(), Self::Error> {
+        self.transaction_async(address, operations).await
     }
 }
 

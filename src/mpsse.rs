@@ -1,3 +1,5 @@
+use futures_lite::future::block_on;
+
 use crate::{ChipType, FtdiError, Interface, Pin, ftdaye::FtdiContext, mpsse_cmd::MpsseCmdBuilder};
 /// State tracker for each pin on the FTDI chip.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -144,12 +146,19 @@ impl FtdiMpsse {
         log::info!("Frequency set to {}Hz", max_frequency / divisor);
         Ok(max_frequency / divisor)
     }
-    /// Write mpsse command and read response
-    pub(crate) fn exec(&self, cmd: impl Into<MpsseCmdBuilder>) -> Result<Vec<u8>, FtdiError> {
+    /// Write mpsse command and read response async
+    pub(crate) async fn exec_async(
+        &self,
+        cmd: impl Into<MpsseCmdBuilder>,
+    ) -> Result<Vec<u8>, FtdiError> {
         let cmd = cmd.into();
         let (cmd, mut response) = cmd.destruct();
-        self.ft.write_read(cmd, &mut response)?;
+        self.ft.async_write_read(cmd, &mut response).await?;
         Ok(response)
+    }
+    /// Write mpsse command and read response
+    pub(crate) fn exec(&self, cmd: impl Into<MpsseCmdBuilder>) -> Result<Vec<u8>, FtdiError> {
+        block_on(self.exec_async(cmd))
     }
     /// Allocate a pin for a specific use.
     pub(crate) fn alloc_pin(&mut self, pin: Pin, usage: PinUsage) -> Result<(), FtdiError> {
