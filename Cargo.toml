@@ -1,0 +1,42 @@
+[package]
+name = "ftdi-tools"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bitfield-struct = "0.13.0"
+blocking = "1.7.0"
+eh1 = { package = "embedded-hal", version = "1" }
+embedded-hal-async = "1.0.0"
+futures-lite = "2.6.1"
+log = "0.4.35"
+nusb = "0.2.9"
+thiserror = "2.0.21"
+
+[dev-dependencies]
+admt4000 = { git = "https://github.com/fan2nd/admt4000" }
+anyhow = "1.0.105"
+as5600 = "0.8.0"
+embedded-graphics = "0.8.2"
+embedded-hal-bus = "0.3.0"
+env_logger = "0.11.12"
+itertools = "0.15.0"
+lm75 = "1.0.0"
+max3010x = "0.2.0"
+mipidsi = "0.10.0"
+sht31 = "0.3.3"
+si5351a-adafruit = "0.1.0"
+spi-flash = "0.4.1"
+ssd1680 = { git = "https://github.com/fan2nd/ssd1680" }
+
+[package.metadata.docs.rs]
+targets = [
+    "x86_64-pc-windows-msvc",
+    "aarch64-pc-windows-msvc",
+    "x86_64-unknown-linux-gnu",
+    "aarch64-unknown-linux-gnu",
+    "armv7-unknown-linux-gnueabihf",
+    "riscv64gc-unknown-linux-gnu",
+    "x86_64-apple-darwin",
+    "aarch64-apple-darwin",
+]
